@@ -2,7 +2,8 @@
 
 Reading data
 
-```{r}
+
+```r
 data <- read.csv(unz("activity.zip", "activity.csv"))
 ```
 
@@ -11,15 +12,16 @@ data <- read.csv(unz("activity.zip", "activity.csv"))
 
 Preprocessing and cleaning steps
 
-```{r}
+
+```r
 cases <- complete.cases(data)
 missingCases <- length(cases[cases==F])
 completeCases <- length(cases[cases==T])
-
 ```
 
 Ignore the incomplete cases on the dataset
-```{r}
+
+```r
 completes <- subset(data,complete.cases(data)==T)   # Subset of the complete cases
 ```
 
@@ -28,7 +30,8 @@ completes <- subset(data,complete.cases(data)==T)   # Subset of the complete cas
 
 Histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 stepsByDay <- split(completes, completes$date, drop=T)                  # divide the complete cases by day
 dailySteps <- sapply(stepsByDay, function(x) sum(x$steps))              # vector with the sum of the steps by day
 hist(dailySteps, main="Histogram Total Steps/Day", xlab="# Steps", col="gray") # draw the histogram
@@ -38,10 +41,18 @@ text(mean(dailySteps),25,labels="mean", pos=4, col="blue")              # draw t
 text(mean(dailySteps),23,labels="median", pos=4, col="red")             # draw the median label
 ```
 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
+
 with the mean and median total number of steps taken per day
 
-```{r}
+
+```r
 summary(dailySteps)                                 # print the dailySteps summary
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    8841   10760   10770   13290   21190
 ```
 
 
@@ -50,8 +61,8 @@ summary(dailySteps)                                 # print the dailySteps summa
 
 Average activity pattern
 
-```{r}
 
+```r
 intervalSplit <- split(completes,completes$interval, drop=TRUE)         # split the complete cases by interval
 intervalAverage <- sapply(intervalSplit, function(x) mean(x$steps))     # vector with the average of steps by day
 plot(intervalAverage, type="l",  main="5' Interval", ylab="Avg No. Steps", xlab="Interval ", col="gray") # draw the plot with the 5' series
@@ -59,25 +70,42 @@ abline(v=which.max(intervalAverage), lty=1, col="red")                  # draw t
 text(which.max(intervalAverage),max(intervalAverage), 
      labels=paste("max is ",as.character(round(max(intervalAverage)))), 
      pos=4, col="red")                                                  # draw the label
-
 ```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
 
 The 5-minute interval that contains the maximum number of steps on average across all the days in the dataset is the interval with the name 835.
 
-```{r}
+
+```r
 names(which.max(intervalAverage)) 
+```
+
+```
+## [1] "835"
 ```
 
 With an average of 206 number of steps.
 
-```{r}
+
+```r
 round(max(intervalAverage))
+```
+
+```
+## [1] 206
 ```
 
 And located in the position number 104 at interval.
 
-```{r}
+
+```r
 which.max(intervalAverage)
+```
+
+```
+## 835 
+## 104
 ```
 
 
@@ -85,14 +113,19 @@ which.max(intervalAverage)
 
 The total number of missing cases is 2304.
 
-```{r}
+
+```r
 missingCases
+```
+
+```
+## [1] 2304
 ```
 
 Filling the NA values with the rounded value of the interval average
 
-```{r}
 
+```r
 dataCases <- cbind(data,cases)                          # dataCases, adding 'cases' column  
 splitCases<-split(dataCases,dataCases$cases, drop=TRUE)  # split by cases 
 
@@ -107,7 +140,8 @@ dataCases <- dataCases[with(dataCases, order(date, interval)), ]         # order
 
 Histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 splitNewByDay <- split(dataCases,dataCases$date, drop=TRUE)                  # split the dataCases by date  
 dailyStepsNew <- sapply(splitNewByDay, function(x) sum(x$steps))         # vector with the sum of the steps by day
 hist(dailyStepsNew, main="New Histogram: Total Steps/Day", xlab="No. Steps", col="gray") # draw the histogram
@@ -115,26 +149,37 @@ abline(v=mean(dailySteps), lty=1, col="blue")                      # draw the me
 abline(v=median(dailySteps), lty=3, col="red")                     # draw the median line
 text(mean(dailySteps),25,labels="mean", pos=4, col="blue")         # draw the mean label
 text(mean(dailySteps),23,labels="median", pos=4, col="red")        # draw the median label
-
 ```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
 
 Comparing summary data (mean and median)
 
 Summary of data without NA
-```{r}
 
+```r
 summary(dailySteps) 
 ```
 
-Summary of data with the substituted value
-```{r}
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    8841   10760   10770   13290   21190
+```
 
+Summary of data with the substituted value
+
+```r
 summary(dailyStepsNew) 
 ```
 
-Comparing the histogram without NA and with the substituted value, there is not a big difference, only the central bar is bigger.
-```{r}
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    9819   10760   10770   12810   21190
+```
 
+Comparing the histogram without NA and with the substituted value, there is not a big difference, only the central bar is bigger.
+
+```r
 par(mfrow=c(1,2))
 
 # histogram without NA
@@ -153,14 +198,23 @@ text(mean(dailySteps),25,labels="mean", pos=4, col="blue")         # draw the me
 text(mean(dailySteps),23,labels="median", pos=4, col="red")        # draw the median label
 ```
 
+![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15-1.png) 
+
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 Differences between weekdays and weekends
-```{r}
 
+```r
 dataCases$date <- as.Date(strptime(dataCases$date, format="%Y-%m-%d")) # convert date column to date class  
 Sys.setlocale("LC_TIME", "English")                                    # set language as english
+```
+
+```
+## [1] "English_United States.1252"
+```
+
+```r
 dataCases$day <- weekdays(dataCases$date)                              # Factor to differentiate weekdays and weekends
 
 # for saturday or sunday day is weekend otherwise day is weekday
@@ -185,6 +239,7 @@ with(stepsByDay, plot(steps ~ interval, type="n", main="Weekday / Weekend Averag
 with(stepsByDay[stepsByDay$day == "weekday",], lines(steps ~ interval, type="l", col="black"))  
 with(stepsByDay[stepsByDay$day == "weekend",], lines(steps ~ interval, type="l", col="gray" ))  
 legend("topright", lty=c(1,1), col = c("black", "gray"), legend = c("weekdays", "weekends"), seg.len=4)
-
 ```
+
+![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16-1.png) 
 
